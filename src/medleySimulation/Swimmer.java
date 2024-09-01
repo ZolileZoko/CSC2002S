@@ -6,18 +6,16 @@ package medleySimulation;
 import java.awt.Color;
 
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
+
 import java.util.concurrent.atomic.AtomicBoolean;
-
-
-
-
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CountDownLatch;
 public class Swimmer extends Thread {
 	
 	public static StadiumGrid stadium; //shared 
 	private FinishCounter finish; //shared
-	
-		
+    public static int countSwimmers;
 	GridBlock currentBlock;
 	private Random rand;
 	private int movingSpeed;
@@ -26,11 +24,10 @@ public class Swimmer extends Thread {
 	private int ID; //thread ID 
 	private int team; // team ID
 	private GridBlock start;
-    public static CountDownLatch latch; 
- 
-    private final Object lock = new Object();
+   static  CyclicBarrier barrier;
 
 
+private static CountDownLatch latch ;
 
 
 	public enum SwimStroke { 
@@ -66,7 +63,14 @@ public class Swimmer extends Thread {
 		finish=f;
       begin = new AtomicBoolean(false);
 		rand=new Random();
+     
+      
 	}
+   
+   public static void initializeLatch(){ latch= new CountDownLatch(10);
+}
+   public static void latchDecrement(){
+  latch.countDown();}
 	
 	//getter
 	public synchronized  int getX() { return currentBlock.getX();}	
@@ -92,7 +96,8 @@ public class Swimmer extends Thread {
 	//!!!You do not need to change the method below!!!
 	//go to the starting blocks
 	//printlns are left here for help in debugging
-	public void goToStartingBlocks() throws InterruptedException {		
+	public void goToStartingBlocks() throws InterruptedException {
+  
 		int x_st= start.getX();
 		int y_st= start.getY();
 	//System.out.println("Thread "+this.ID + " has start position: " + x_st  + " " +y_st );
@@ -104,6 +109,7 @@ public class Swimmer extends Thread {
 			currentBlock=stadium.moveTowards(currentBlock,x_st,y_st,myLocation); //head toward starting block
 		//	System.out.println("Thread "+this.ID + " moved toward start to position: " + currentBlock.getX()  + " " +currentBlock.getY() );
 		}
+       Swimmer.latchDecrement();
 	System.out.println("-----------Thread "+this.ID + " at start " + currentBlock.getX()  + " " +currentBlock.getY() );
 	}
 	
@@ -152,8 +158,8 @@ public class Swimmer extends Thread {
 			//Swimmer arrives
 			sleep(movingSpeed+(rand.nextInt(10))); //arriving takes a while
 			myLocation.setArrived();
-			enterStadium();	
-         goToStartingBlocks();
+			         
+         
          // continuously check for start button press signal to commence race
 			synchronized(this.begin){
          while(!begin.get()){
@@ -165,7 +171,10 @@ public class Swimmer extends Thread {
          
          }
          
-			
+			enterStadium();	
+         goToStartingBlocks();
+        //wait for 10 swimmers      
+         latch.await();
 			dive(); 
 				
 			swimRace();
@@ -177,7 +186,7 @@ public class Swimmer extends Thread {
 				exitPool();//if not last swimmer leave pool
 			}
 			
-		} catch (InterruptedException e1) {  //do nothing
+		} catch (InterruptedException e1){
 		} 
 	}
    

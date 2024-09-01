@@ -91,8 +91,8 @@ public class MedleySimulation {
 	
 //Main method - starts it all
 	public static void main(String[] args) throws InterruptedException {
-	
-	
+	   Swimmer.initializeLatch();
+	  // Swimmer.initializeBarrier(); // initialize  Barrier
 	    finishLine = new FinishCounter(); //counters for people inside and outside club
 	 
 		stadiumGrid = new StadiumGrid(gridX, gridY, numTeams,finishLine); //setup stadium with size     
@@ -116,6 +116,9 @@ public class MedleySimulation {
       	//start teams, which start swimmers.
       	for (int i=0;i<numTeams;i++) {
 			teams[i].start();
-		}
+         		}
+     
+
+
 	}
 }

@@ -109,6 +109,7 @@ private static CountDownLatch latch ;
 			currentBlock=stadium.moveTowards(currentBlock,x_st,y_st,myLocation); //head toward starting block
 		//	System.out.println("Thread "+this.ID + " moved toward start to position: " + currentBlock.getX()  + " " +currentBlock.getY() );
 		}
+      // Decrements every time a  backstroke swimmer from a team arrives at the starting blocks. 
        Swimmer.latchDecrement();
 	System.out.println("-----------Thread "+this.ID + " at start " + currentBlock.getX()  + " " +currentBlock.getY() );
 	}

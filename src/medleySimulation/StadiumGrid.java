@@ -85,7 +85,7 @@ public class StadiumGrid {
 	
 	//returns starting block for a team (the lane)
 	public synchronized GridBlock returnStartingBlock(int team) {
-   //Swimmer.latchDecrement(); //Decrement latch as each team is started
+   
 
 			return startingBlocks[team];
 	}

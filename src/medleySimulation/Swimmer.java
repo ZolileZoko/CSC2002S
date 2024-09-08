@@ -19,15 +19,20 @@ public class Swimmer extends Thread {
 	GridBlock currentBlock;
 	private Random rand;
 	private int movingSpeed;
-   static AtomicBoolean  begin;
+   static AtomicBoolean  begin,order;
 	private PeopleLocation myLocation;
 	private int ID; //thread ID 
 	private int team; // team ID
 	private GridBlock start;
-   static  CyclicBarrier barrier;
+   public AtomicBoolean baton;
+   static int count;
+ //   CountDownlatch latch
+private static CountDownLatch latch;
+ private static final Object lock = new Object();
+ private SwimTeam swimmingTeam;
+   private SwimTeam swimTeam;
+   private AtomicBoolean [] batons;
 
-
-private static CountDownLatch latch ;
 
 
 	public enum SwimStroke { 
@@ -53,7 +58,7 @@ private static CountDownLatch latch ;
 	    private final SwimStroke swimStroke;
 	
 	//Constructor
-	Swimmer( int ID, int t, PeopleLocation loc, FinishCounter f, int speed, SwimStroke s) {
+	Swimmer( int ID, int t, PeopleLocation loc, FinishCounter f, int speed, SwimStroke s,boolean signal,AtomicBoolean [] batons,SwimTeam swimteam) {
 		this.swimStroke = s;
 		this.ID=ID;
 		movingSpeed=speed; //range of speeds for swimmers
@@ -63,14 +68,26 @@ private static CountDownLatch latch ;
 		finish=f;
       begin = new AtomicBoolean(false);
 		rand=new Random();
-     
-      
+      this.baton=new AtomicBoolean(signal);// passing reference
+       this.batons=batons; //pass by reference
+       swimTeam=swimteam;
 	}
+  
    
-   public static void initializeLatch(){ latch= new CountDownLatch(10);
+   public synchronized static void initializeLatch(){
+        
+            latch = new CountDownLatch(10);
+        
+
 }
-   public static void latchDecrement(){
-  latch.countDown();}
+public synchronized static void latchDecrement(){
+
+  latch.countDown();
+    }
+ 
+
+   
+ 
 	
 	//getter
 	public synchronized  int getX() { return currentBlock.getX();}	
@@ -110,8 +127,9 @@ private static CountDownLatch latch ;
 		//	System.out.println("Thread "+this.ID + " moved toward start to position: " + currentBlock.getX()  + " " +currentBlock.getY() );
 		}
       // Decrements every time a  backstroke swimmer from a team arrives at the starting blocks. 
+     	System.out.println("-----------Thread "+this.ID + " at start " + currentBlock.getX()  + " " +currentBlock.getY() );
        Swimmer.latchDecrement();
-	System.out.println("-----------Thread "+this.ID + " at start " + currentBlock.getX()  + " " +currentBlock.getY() );
+
 	}
 	
 	//!!!You do not need to change the method below!!!
@@ -119,7 +137,7 @@ private static CountDownLatch latch ;
 	private void dive() throws InterruptedException {
 		int x= currentBlock.getX();
 		int y= currentBlock.getY();
-		currentBlock=stadium.jumpTo(currentBlock,x,y-2,myLocation);
+		currentBlock=stadium.jumpTo(currentBlock,x,y-2,myLocation);      
 	}
 	
 	//!!!You do not need to change the method below!!!
@@ -149,48 +167,108 @@ private static CountDownLatch latch ;
 		currentBlock=stadium.moveTowards(currentBlock,lane,currentBlock.getY(),myLocation);
 	   while (currentBlock.getY()!=bench) {
 		 	currentBlock=stadium.moveTowards(currentBlock,lane,bench,myLocation);
-			sleep(movingSpeed*3);  //not rushing 
-		}
-	}
+			sleep(movingSpeed*3);  //not rushing
 	
-	public void run() {
-		try {
-			
-			//Swimmer arrives
-			sleep(movingSpeed+(rand.nextInt(10))); //arriving takes a while
-			myLocation.setArrived();
-			         
-         
-         // continuously check for start button press signal to commence race
-			synchronized(this.begin){
-         while(!begin.get()){
-         try{
-         
-         begin.wait();
-         }   catch(InterruptedException e){}
-         }
-         
-         }
-         
-			enterStadium();	
-         goToStartingBlocks();
-        //wait for 10 swimmers      
-         latch.await();
-			dive(); 
-				
-			swimRace();
-			if(swimStroke.order==4) {
-				finish.finishRace(ID, team); // finishline
-			}
-			else {
-				//System.out.println("Thread "+this.ID + " done " + currentBlock.getX()  + " " +currentBlock.getY() );			
-				exitPool();//if not last swimmer leave pool
-			}
-			
-		} catch (InterruptedException e1){
-		} 
+         		}
 	}
    
+   
+
+public void run() {
+        try {
+            // Swimmer arrives
+            sleep(movingSpeed + (rand.nextInt(10))); // arriving takes a while
+            myLocation.setArrived();
+
+            // Continuously check for start button press signal to commence race
+            synchronized (this.begin) {
+                while (!begin.get()) {
+                    try {
+                        begin.wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+  // Only allow the swimmer with Backstroke stroke to enter first initialy into the stadium
+            synchronized (batons) {
+             System.out.println(Thread.currentThread().getName() + " waiting.");
+               while (swimStroke.getOrder() != swimTeam.counter.get() + 1 || !batons[swimTeam.counter.get()].get()) {
+                 batons.wait();
+                }
+                System.out.println(Thread.currentThread().getName() + " received the baton signal.");
+               
+             // let swimmers enter stadium
+              enterStadium();
+              
+             
+
+                                   }
+                            
+                // Notify the next swimmer             
+                       synchronized (batons){
+               //reset current swimmer's baton given they have passed it on
+               batons[swimTeam.counter.get()].set(false);  
+
+             // Increment the counter and pass the baton to the next swimmer
+            int nextSwimmer = (swimTeam.counter.get() + 1) % 4;
+            swimTeam.counter.set(nextSwimmer);  // Move to the next swimmer
+            System.out.println("Swimmer " + nextSwimmer + " is receiving the baton.");
+            batons[nextSwimmer].set(true);  // Pass baton to next swimmer
+           
+                batons.notifyAll();  // Wake up  swimmers
+            
+            System.out.println(Thread.currentThread().getName() + " finished swimming and passed the baton.");
+        }   
+        goToStartingBlocks();
+        latch.await(); // wait for all 10 backstroke swimmers to reach starting blocks
+        
+        
+          // Only allow the swimmer with Backstroke stroke to enter first initialy into the stadium
+            synchronized (batons) {
+             System.out.println(Thread.currentThread().getName() + " waiting.");
+               while (!batons[swimTeam.counter.get()].get()) {
+                 batons.wait();
+                }
+                System.out.println(Thread.currentThread().getName() + " received the baton signal.");
+               
+             // let swimmers dive and swim
+              
+        dive();
+        swimRace();
+              
+             
+
+                                   }
+     
+
+                       
+                       // Pass the baton
+                if (swimStroke.getOrder() == 4) { // If last swimmer
+                    finish.finishRace(ID, team); // finish line
+                } else {
+                    exitPool(); // if not last swimmer leave pool
+                    
+                    // Notify the next swimmer             
+                       synchronized (batons){
+               
+             // Increment the counter and pass the baton to the next swimmer
+            int nextSwimmer = (swimTeam.counter.get() + 1) % 4;
+            swimTeam.counter.set(nextSwimmer);  // Move to the next swimmer
+            System.out.println("Swimmer " + nextSwimmer + " is receiving the baton.");
+            batons[nextSwimmer].set(true);  // Pass baton to next swimmer
+           
+                batons.notifyAll();  // Wake up  swimmers
+            
+            System.out.println(Thread.currentThread().getName() + " finished swimming and passed the baton.");
+        } 
+                }
+                
+                          
+
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
+    }   
 
 	
 }

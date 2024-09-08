@@ -30,7 +30,7 @@ public class StadiumGrid {
 		}
 	
 	//initialise the grid, creating all the GridBlocks, marking the starting blocks
-	private  void initGrid() throws InterruptedException {
+	private synchronized void initGrid() throws InterruptedException {
 		int startBIndex=0;
 		for (int i=0;i<x;i++) {
 			for (int j=0;j<y;j++) {
@@ -126,7 +126,7 @@ public class StadiumGrid {
 	} 
 	
 	//levitate to a specific block -
-public synchronized GridBlock jumpTo(GridBlock currentBlock,int x, int y,PeopleLocation myLocation) throws InterruptedException {  
+public GridBlock jumpTo(GridBlock currentBlock,int x, int y,PeopleLocation myLocation) throws InterruptedException {  
 		//restrict i and j to grid
 		if (!inStadiumArea(x,y)) {
 			System.out.println("Invalid move");

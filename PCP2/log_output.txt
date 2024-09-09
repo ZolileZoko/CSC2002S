@@ -1,0 +1,11 @@
+* 8ee43eb 2024-09-09 arranged repository in a more organized manner
+*   d85b34a 2024-09-09 Merge remote-tracking branch 'origin/main' `
+|\  
+| * c2fecf4 2024-09-09 Create code
+| * 305e7e9 2024-09-09 Initial commit
+* d24db75 2024-09-09 changed comments
+* 0e06857 2024-09-09 Added comments for changes made to code
+* 32fb76c 2024-09-09 Added baton system for allowing swimmers access into the stadium according to their swimming positions for their respective teams and then reused this baton system for the actual swimming relay to allow swimmers to do a legal handover during the  relay
+* 715c508 2024-09-01 Implemented Java Monitor pattern to synchronize Swimmer.java and also added comments for latch decrement in StadiumGrid.java
+* 6e2da8b 2024-09-01 Added a latch that waits for all 10 backstroke swimmers to arrive before race starts, every other swimmer following the the backstroke swimmers has to wait for them to finish and then run up to the wall at the end of the stadium before being allowed to enter the stadium.
+* 5c067ac 2024-08-31 Added source files

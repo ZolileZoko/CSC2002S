@@ -1,4 +1,6 @@
 //M. M. Kuttel 2024 mkuttel@gmail.com
+//Modified by Zolile Zoko ZKXZOL001,CSC2002 PCP Assignment 2, 2024
+
 // MedleySimulation main class, starts all threads
 package medleySimulation;
 
@@ -59,7 +61,7 @@ public class MedleySimulation {
         b.setLayout(new BoxLayout(b, BoxLayout.LINE_AXIS)); 
         
         JButton startB = new JButton("Start");
-		// add the listener to the jbutton to handle the "pressed" event
+		// add the listener to the jbutton to handle the "pressed" event and signal to swimmers that they can enter the stadiaum.
 		startB.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e)  {
          synchronized(Swimmer.begin){

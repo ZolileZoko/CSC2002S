@@ -1,4 +1,5 @@
 //M. M. Kuttel 2024 mkuttel@gmail.com
+//Modified by Zolile Zoko ZKXZOL001,CSC2002 PCP Assignment 2, 2024
 // Simple Thread class to update the display of a text field
 package medleySimulation;
 

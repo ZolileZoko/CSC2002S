@@ -1,4 +1,5 @@
 //M. M. Kuttel 2024 mkuttel@gmail.com
+//Modified by Zolile Zoko ZKXZOL001,CSC2002 PCP Assignment 2, 2024
 // GridBlock class to represent a block in the grid.
 // only one thread at a time "owns" a GridBlock - this must be enforced
 

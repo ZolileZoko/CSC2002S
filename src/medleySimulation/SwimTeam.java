@@ -1,4 +1,5 @@
 //M. M. Kuttel 2024 mkuttel@gmail.com
+//Modified by Zolile Zoko ZKXZOL001,CSC2002 PCP Assignment 2, 2024
 //Class to represent a swim team - which has four swimmers
 package medleySimulation;
 
@@ -18,10 +19,6 @@ public class SwimTeam extends Thread {
 	private Swimmer [] swimmers;
 	private int teamNo; //team number
    static int num;
-   
-   private int currentIndex;
- 	static AtomicBoolean  ordering;
-   public static CyclicBarrier barrier;
    public  AtomicInteger counter,teamCounter;
 
 	public static final int sizeOfTeam=4;
@@ -31,7 +28,6 @@ public class SwimTeam extends Thread {
 
 	SwimTeam( int ID, FinishCounter finish,PeopleLocation [] locArr ) {
 		this.teamNo=ID;
-		currentIndex=0;
 		swimmers= new Swimmer[sizeOfTeam];
 	    SwimStroke[] strokes = SwimStroke.values();  // Get all enum constants
 		stadium.returnStartingBlock(ID);
@@ -51,22 +47,22 @@ public class SwimTeam extends Thread {
 	      	int speed=(int)(Math.random() * (3)+30); //range of speeds 
             
           batons[s] = new AtomicBoolean(strokes[s] == SwimStroke.Backstroke); // Set true if Backstroke, else false
+          // pass by reference of batons array to allow its modification
 			swimmers[s] = new Swimmer(i,teamNo,locArr[i],finish,speed,strokes[s],batons[s].get(),batons,this); //hardcoded speed for now
-                     System.out.println(Thread.currentThread().getName() + " is waiting for the baton signal. Baton value: " + swimmers[s].baton.get());}
+       //              System.out.println(Thread.currentThread().getName() + " is waiting for the baton signal. Baton value: " + swimmers[s].baton.get());}
        
          
              
          
 		
      
-	}
+	}}
    
 	
 	
 	public  void run() {
             
-		//try{
-        
+		
                  
 			for (int i = 0; i <sizeOfTeam; i++) {
 
@@ -74,24 +70,11 @@ public class SwimTeam extends Thread {
        
            swimmers[i].start();//start swimmer threads 
 
-  //    swimmers[i].join();
-   
-        //                
   
        
        
         }    
-                      
-         
-   
-   
-						
-	//for(int s=0;s<sizeOfTeam; s++){ swimmers[s].join();} //don't really need to do this;
-			
-	//} catch (InterruptedException e) {
-	 //TODO Auto-generated catch block
-	//e.printStackTrace();
-//	}
+                     
 }
 }
 	

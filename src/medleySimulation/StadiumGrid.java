@@ -1,5 +1,5 @@
 //M. M. Kuttel 2024 mkuttel@gmail.com
-//Class representing the grid for the simulation, made up of grid blocks.
+//Modified by Zolile Zoko ZKXZOL001,CSC2002 PCP Assignment 2, 2024
 
 package medleySimulation;
 
@@ -68,7 +68,7 @@ public class StadiumGrid {
 	
 	//a person enters the stadium
 	public  GridBlock enterStadium(PeopleLocation myLocation) throws InterruptedException  {
-   System.out.println("Thread " + myLocation.getID() + " is waiting.");
+//   System.out.println("Thread " + myLocation.getID() + " is waiting.");
    
    
 
@@ -78,7 +78,7 @@ public class StadiumGrid {
 				while(!(entrance.get(myLocation.getID()))) {entrance.wait();} }//wait at entrance until entrance is free - spinning, not good
 				myLocation.setLocation(entrance);
 				myLocation.setInStadium(true);
-            System.out.println("Thread " + myLocation.getID() + " is proceeding.");
+  //          System.out.println("Thread " + myLocation.getID() + " is proceeding.");
 				return entrance;
 			
 	}

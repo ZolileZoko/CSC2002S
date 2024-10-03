@@ -58,7 +58,7 @@ To compile and run the project, follow these steps:
    make
 
 2. **Execution:**
-   ``` java -cp bin concurrentSwimmingRelay.SwimmingRelaySimulation
+   java -cp bin concurrentSwimmingRelay.SwimmingRelaySimulation
 
 
 **Report**

@@ -58,15 +58,15 @@ To compile and run the project, follow these steps:
    make
 
 2. **Execution:**
-   java -cp bin concurrentSwimmingRelay.SwimmingRelaySimulation
+   ``` java -cp bin concurrentSwimmingRelay.SwimmingRelaySimulation
 
 
 **Report**
 A detailed report (PCP2_Report.pdf) is available in the reports/ directory. The report discusses:
 
--The thread safety mechanisms employed in the simulation.
--Performance considerations for the concurrency model used.
--Reflections on the challenges and solutions implemented during development.
+- The thread safety mechanisms employed in the simulation.
+- Performance considerations for the concurrency model used.
+- Reflections on the challenges and solutions implemented during development.
 Contributions
 Feel free to open a pull request or an issue if you have any suggestions or improvements!
 

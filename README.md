@@ -62,7 +62,7 @@ To compile and run the project, follow these steps:
 
 
 **Report**
-A detailed report (PCP2_Report.pdf) is available in the reports/ directory. The report discusses:
+A detailed report (ZKXZOL001_PCP2_Report.pdf) is available in the reports/ directory. The report discusses:
 
 - The thread safety mechanisms employed in the simulation.
 - Performance considerations for the concurrency model used.
